@@ -8,6 +8,7 @@ class Shader
         unsigned int ID;
 
         Shader(const char* vertPath, const char* fragPath);
+        Shader();
 
         void use();
 

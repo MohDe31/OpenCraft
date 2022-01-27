@@ -22,7 +22,7 @@ enum DIRECTION {
 
 const int CHUNK_WIDTH  = 16;
 const int CHUNK_LENGTH = 16;
-const int CHUNK_HEIGHT = 256;
+const int CHUNK_HEIGHT = 16;
 
 typedef struct Chunk {
     glm::vec2 position;
@@ -31,7 +31,8 @@ typedef struct Chunk {
     Mesh m_Mesh;
 
     Chunk();
-    Chunk(float x, float y);
+    Chunk(int x, int y);
+    Chunk(int x, int y, std::vector<std::vector<int>> heightMap);
 
 
     void getNeighboor(int i, int j, int k, int* output, int* size);

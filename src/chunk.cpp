@@ -1,6 +1,4 @@
 #include <chunk.h>
-#include <iostream>
-
 #include <vector>
 
 
@@ -38,7 +36,7 @@ unsigned int m[6][6] = {
     {3, 2, 11, 11, 15, 3  },
 };
 
-Chunk::Chunk(float x, float y): position(glm::vec2(x, y))
+Chunk::Chunk(int x, int y): position(glm::vec2(x, y))
 {
     for (int i = 0; i < CHUNK_WIDTH; i += 1)
         for (int j = 0; j < CHUNK_LENGTH; j += 1)
@@ -46,6 +44,21 @@ Chunk::Chunk(float x, float y): position(glm::vec2(x, y))
             {
                 chunkData[i][j][k] = DIRT;
             }
+}
+
+Chunk::Chunk(int x, int y, std::vector<std::vector<int>> heightMap): position(glm::vec2(x, y))
+{
+    for (int i = 0; i < CHUNK_WIDTH; i += 1)
+        for (int j = 0; j < CHUNK_LENGTH; j += 1)
+        {
+            for(int k = 0; k < CHUNK_HEIGHT; k+=1)
+            {
+                if(k < heightMap[i][j]) chunkData[i][j][k] = DIRT;
+                else chunkData[i][j][k] = AIR;
+            }
+
+        }
+
 }
 
 Chunk::Chunk() {}
@@ -94,6 +107,8 @@ void Chunk::calculateVerticies()
     for(int j = 0; j < CHUNK_LENGTH; j+=1)
     for(int k = 0; k < CHUNK_HEIGHT; k+=1)
     {
+        if(chunkData[i][j][k] == AIR) continue;
+        
         size = 0;
         getNeighboor(i, j, k, neigh, &size);
         for(int z = 0; z < size; z+=1)
@@ -110,6 +125,7 @@ void Chunk::calculateVerticies()
             }
         }
     }
+
 }
 
 void Chunk::generateMesh()
