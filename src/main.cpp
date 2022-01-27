@@ -5,6 +5,8 @@
 
 #include <camera.h>
 #include <shader.h>
+#include <world.h>
+#include <renderer.h>
 
 #include <glm/glm/glm.hpp>
 #include <glm/glm/gtc/matrix_transform.hpp>
@@ -22,6 +24,7 @@ float lastFrame = 0.0f;
 int lastX = WINDOW_WIDTH / 2;
 int lastY = WINDOW_HEIGHT / 2;
 
+World world = World();
 Camera camera(0.0f, 0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 45.0f);
 
 bool mouseInit = false;
@@ -45,9 +48,9 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.transform.position += glm::normalize(glm::cross(camera.transform.front, camera.transform.up)) * cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.transform.position += cameraSpeed * camera.transform.up;
+        camera.transform.position += cameraSpeed * WORLD_UP;
     if(glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-        camera.transform.position -= cameraSpeed * camera.transform.up;
+        camera.transform.position -= cameraSpeed * WORLD_UP;
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
@@ -63,7 +66,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
     lastX = xpos;
     lastY = ypos;
 
-    const float sensitivity = 4.0f * deltaTime;
+    const float sensitivity = 2.0f * deltaTime;
     xOffset *= sensitivity;
     yOffset *= sensitivity;
 
@@ -118,80 +121,61 @@ int main(int, char**)
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
 
-
-
+/*
     float vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, // 0
+        0.5f, -0.5f, -0.5f,  1.0f, 0.0f, // 1
+        0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 2
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, // 3
 
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // 4
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f, // 5
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f, // 6
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, // 7
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // 8
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, // 9
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // 10
 
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 0.0f, // 11
+        0.5f, -0.5f, -0.5f,  0.0f, 1.0f, // 12
+        0.5f, -0.5f,  0.5f,  0.0f, 0.0f, // 13
 
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f, -0.5f,  1.0f, 1.0f, // 14
 
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, // 15
+    };*/
 
 
 
     /*unsigned int indices[] = {  
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        0, 1, 2, 2, 3, 0, // LEFT SIDE
+        4, 5, 6, 6, 7, 4, // RIGHT SIDE
+        8, 9, 10, 10, 4, 8, // BACK SIDE
+        11, 2, 12, 12, 13, 11, // FRONT SIDE
+        10, 14, 5, 5, 4, 10, // BOTTOM
+        3, 2, 11, 11, 15, 3 // TOP
     };*/
 
 
-    unsigned int VAO, VBO, EBO;
+    /*unsigned int VAO;
     glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    // glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    */
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     // glEnableVertexAttribArray(1);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     int width, height, nbrChannel;
     //----- TEXTURE
@@ -205,7 +189,7 @@ int main(int, char**)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    unsigned char* data = stbi_load("../res/textures/dirt.png", &width, &height, &nbrChannel, 0);
+    unsigned char* data = stbi_load("../res/textures/wood.png", &width, &height, &nbrChannel, 0);
     if(!data){
         std::cout << "Failed to load texture" << std::endl;
         return -1;
@@ -246,6 +230,12 @@ int main(int, char**)
     glm::mat4 projection;
     glm::mat4 view;
 
+    world.chunks[0][0].generateMesh();
+
+    world.chunks[0][1].generateMesh();
+
+    world.chunks[0][2].generateMesh();
+
     // Rendering loop
     while(!glfwWindowShouldClose(window))
     {
@@ -271,20 +261,27 @@ int main(int, char**)
         glBindTexture(GL_TEXTURE_2D, texture);
         // glActiveTexture(GL_TEXTURE1);
         // glBindTexture(GL_TEXTURE_2D, texture2);
-        glBindVertexArray(VAO);
-        for(int i = 0; i < 16; i+=1)
+        // glBindVertexArray(VAO);
+        /*for(int i = 0; i < 32; i+=1)
         {
-            //for(int j = 0; j < 16; j+=1)
-            //{
-                //for(int k = 0; k < 255; k+=1){
+            for(int j = 0; j < 32; j+=1)
+            {
+                for(int k = 0; k < 32; k+=1){
                     model = glm::mat4(1.0f);
                     // model = glm::rotate(model, glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-                    model = glm::translate(model, glm::vec3(i, i, i));
+                    model = glm::translate(model, glm::vec3(i, -32+k, j));
+                    // glm::vec3 offset(i, -64+k, j);
+                    // model[3] = model[0] * offset[0] + model[1] * offset[1] + model[2] * offset[2] + model[3];
                     program.setMat4("model", glm::value_ptr(model));
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                //}
-            //}
-        }
+                    // glDrawArrays(GL_TRIANGLES, 0, 36);
+                    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+                }
+            }
+        }*/
+
+        chunk_renderer(world.chunks[0][0], program);
+        chunk_renderer(world.chunks[0][1], program);
+        chunk_renderer(world.chunks[0][2], program);
 
         //---------------------------------------------------------
 
