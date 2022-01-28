@@ -22,13 +22,14 @@ float voxelUvs[] = {
 	1.0f, 1.0f
 };
 
-unsigned int voxelIndices[6][6] = {
-    {0, 1, 2, 2, 3, 0}, // BACK FACE
-    {4, 5, 6, 6, 7, 4}, // FRONT FACE
-    {7, 3, 0, 0, 4, 7}, // LEFT FACE
-    {6, 2, 1, 1, 5, 6}, // RIGHT FACE
-    {0, 1, 5, 5, 4, 0}, // BOTTOM FACE
-    {3, 2, 6, 6, 7, 3}, // TOP FACE
+// 0 1 2 2 3 0
+unsigned int voxelIndices[6][4] = {
+    {0, 1, 2, 3}, // BACK FACE
+    {4, 5, 6, 7}, // FRONT FACE
+    {7, 3, 0, 4}, // LEFT FACE
+    {6, 2, 1, 5}, // RIGHT FACE
+    {0, 1, 5, 4}, // BOTTOM FACE
+    {3, 2, 6, 7}, // TOP FACE
 };
 
 
@@ -97,7 +98,7 @@ void Chunk::calculateVerticies()
 {
     m_Mesh.m_Verticies.clear();
 
-    int meshIndex;
+    unsigned int vertexIndex = 0;
     int neigh[6];
     int size;
     for(int i = 0; i < CHUNK_WIDTH ; i+=1)
@@ -112,6 +113,8 @@ void Chunk::calculateVerticies()
         {
             int dir = neigh[z];
 
+
+
             for(auto& idx: voxelIndices[dir])
             {
                 m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 0] + i);
@@ -125,15 +128,21 @@ void Chunk::calculateVerticies()
             m_Mesh.m_Uvs.push_back(voxelUvs[2 * 2 + 1]);
             m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 0]);
             m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 1]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 1]);
             m_Mesh.m_Uvs.push_back(voxelUvs[1 * 2 + 0]);
             m_Mesh.m_Uvs.push_back(voxelUvs[1 * 2 + 1]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[0 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[0 * 2 + 1]);
-        }
-    }
 
+            m_Mesh.m_Triangles.push_back(vertexIndex + 0);
+            m_Mesh.m_Triangles.push_back(vertexIndex + 1);
+            m_Mesh.m_Triangles.push_back(vertexIndex + 2);
+            m_Mesh.m_Triangles.push_back(vertexIndex + 2);
+            m_Mesh.m_Triangles.push_back(vertexIndex + 3);
+            m_Mesh.m_Triangles.push_back(vertexIndex + 0);
+
+
+            vertexIndex += 4;
+        }
+
+    }
 }
 
 void Chunk::generateMesh()
