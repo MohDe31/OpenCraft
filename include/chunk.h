@@ -37,6 +37,7 @@ typedef struct Chunk {
 
 
     void getNeighboor(int i, int j, int k, int* output, int* size);
+    void addTexture(BLOCK_TYPE block_type);
     void calculateVerticies();
     void generateMesh();
 } Chunk;

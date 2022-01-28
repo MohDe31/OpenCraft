@@ -1,6 +1,13 @@
 #include <chunk.h>
 #include <vector>
+#include <map>
 
+const float TEXTURE_SIZE = 0.5f;
+
+const std::map<BLOCK_TYPE, std::pair<int, int>> TEXTURE_MAP = {
+    {DIRT,  {0, 0}},
+    {GRASS, {1, 0}}
+};
 
 
 float voxelVerticies[] = {
@@ -16,11 +23,10 @@ float voxelVerticies[] = {
 };
 
 float voxelUvs[] = {
-	0.0f, 0.0f,
-	0.0f, 1.0f,
-	1.0f, 0.0f,
-	1.0f, 1.0f
-};
+    0.0f, 0.0f,
+    0.0f, 1.0f,
+    1.0f, 0.0f,
+    1.0f, 1.0f};
 
 // 0 1 2 2 3 0
 unsigned int voxelIndices[6][4] = {
@@ -32,8 +38,7 @@ unsigned int voxelIndices[6][4] = {
     {3, 2, 6, 7}, // TOP FACE
 };
 
-
-Chunk::Chunk(int x, int y): position(glm::vec2(x, y))
+Chunk::Chunk(int x, int y) : position(glm::vec2(x, y))
 {
     for (int i = 0; i < CHUNK_WIDTH; i += 1)
         for (int j = 0; j < CHUNK_LENGTH; j += 1)
@@ -43,24 +48,24 @@ Chunk::Chunk(int x, int y): position(glm::vec2(x, y))
             }
 }
 
-Chunk::Chunk(int x, int y, std::vector<std::vector<int>> heightMap): position(glm::vec2(x, y))
+Chunk::Chunk(int x, int y, std::vector<std::vector<int>> heightMap) : position(glm::vec2(x, y))
 {
     for (int i = 0; i < CHUNK_WIDTH; i += 1)
         for (int j = 0; j < CHUNK_LENGTH; j += 1)
         {
-            for(int k = 0; k < CHUNK_HEIGHT; k+=1)
+            for (int k = 0; k < CHUNK_HEIGHT; k += 1)
             {
-                if(k < heightMap[i][j]) chunkData[i][j][k] = DIRT;
-                else chunkData[i][j][k] = AIR;
+                if (k < heightMap[i][j])
+                    chunkData[i][j][k] = DIRT;
+                else
+                    chunkData[i][j][k] = AIR;
             }
-
         }
-
 }
 
 Chunk::Chunk() {}
 
-void Chunk::getNeighboor(int i, int j, int k, int* output, int* size)
+void Chunk::getNeighboor(int i, int j, int k, int *output, int *size)
 {
     if (k == CHUNK_HEIGHT - 1 || chunkData[i][j][k + 1] == AIR)
     {
@@ -91,7 +96,6 @@ void Chunk::getNeighboor(int i, int j, int k, int* output, int* size)
     {
         *(output + (*size)++) = 0;
     }
-    
 }
 
 void Chunk::calculateVerticies()
@@ -101,53 +105,59 @@ void Chunk::calculateVerticies()
     unsigned int vertexIndex = 0;
     int neigh[6];
     int size;
-    for(int i = 0; i < CHUNK_WIDTH ; i+=1)
-    for(int j = 0; j < CHUNK_LENGTH; j+=1)
-    for(int k = 0; k < CHUNK_HEIGHT; k+=1)
-    {
-        if(chunkData[i][j][k] == AIR) continue;
-        
-        size = 0;
-        getNeighboor(i, j, k, neigh, &size);
-        for(int z = 0; z < size; z+=1)
-        {
-            int dir = neigh[z];
-
-
-
-            for(auto& idx: voxelIndices[dir])
+    for (int i = 0; i < CHUNK_WIDTH; i += 1)
+        for (int j = 0; j < CHUNK_LENGTH; j += 1)
+            for (int k = 0; k < CHUNK_HEIGHT; k += 1)
             {
-                m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 0] + i);
-                m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 1] + k);
-                m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 2] + j);
+                if (chunkData[i][j][k] == AIR)
+                    continue;
+
+                size = 0;
+                getNeighboor(i, j, k, neigh, &size);
+                for (int z = 0; z < size; z += 1)
+                {
+                    int dir = neigh[z];
+
+                    for (auto &idx : voxelIndices[dir])
+                    {
+                        m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 0] + i);
+                        m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 1] + k);
+                        m_Mesh.m_Verticies.push_back(voxelVerticies[idx * 3 + 2] + j);
+                    }
+
+                    addTexture(chunkData[i][j][k]);
+
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 0);
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 1);
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 2);
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 2);
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 3);
+                    m_Mesh.m_Triangles.push_back(vertexIndex + 0);
+
+                    vertexIndex += 4;
+                }
             }
+}
+void Chunk::addTexture(BLOCK_TYPE block_type)
+{
+    std::pair<int, int> tPos = TEXTURE_MAP.at(block_type);
 
-            m_Mesh.m_Uvs.push_back(voxelUvs[0 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[0 * 2 + 1]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[2 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[2 * 2 + 1]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[3 * 2 + 1]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[1 * 2 + 0]);
-            m_Mesh.m_Uvs.push_back(voxelUvs[1 * 2 + 1]);
+    float xPos = (1.0f / TEXTURE_SIZE) * tPos.first;
+    float yPos = (1.0f / TEXTURE_SIZE) * tPos.second;
 
-            m_Mesh.m_Triangles.push_back(vertexIndex + 0);
-            m_Mesh.m_Triangles.push_back(vertexIndex + 1);
-            m_Mesh.m_Triangles.push_back(vertexIndex + 2);
-            m_Mesh.m_Triangles.push_back(vertexIndex + 2);
-            m_Mesh.m_Triangles.push_back(vertexIndex + 3);
-            m_Mesh.m_Triangles.push_back(vertexIndex + 0);
-
-
-            vertexIndex += 4;
-        }
-
-    }
+    m_Mesh.m_Uvs.push_back(xPos + voxelUvs[0 * 2 + 0] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(yPos + voxelUvs[0 * 2 + 1] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(xPos + voxelUvs[2 * 2 + 0] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(yPos + voxelUvs[2 * 2 + 1] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(xPos + voxelUvs[3 * 2 + 0] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(yPos + voxelUvs[3 * 2 + 1] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(xPos + voxelUvs[1 * 2 + 0] * TEXTURE_SIZE);
+    m_Mesh.m_Uvs.push_back(yPos + voxelUvs[1 * 2 + 1] * TEXTURE_SIZE);
 }
 
 void Chunk::generateMesh()
 {
-    if(!m_Mesh.m_Verticies.size())
+    if (!m_Mesh.m_Verticies.size())
     {
         calculateVerticies();
     }

@@ -117,7 +117,7 @@ void Application::Init(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); // set texture filtering to nearest neighbor to clearly see the texels/pixels
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    unsigned char* data = stbi_load("../res/textures/dirt.png", &width, &height, &nbrChannel, 0);
+    unsigned char* data = stbi_load("../res/textures/tile.jpg", &width, &height, &nbrChannel, 0);
     if(!data){
         std::cout << "Failed to load texture" << std::endl;
         return;
