@@ -26,9 +26,9 @@ namespace Application {
     inline int lastY = WINDOW_HEIGHT / 2;
 
     inline World world;
-    inline Camera camera(0.0f, 0.0f, 0.0f, 0.0f, -90.0f, 0.0f, 45.0f);
-    inline Shader program;//("/home/jae/Projects/CPP/OGL_ENGINE/res/shader.vert", "/home/jae/Projects/CPP/OGL_ENGINE/res/shader.frag");
-
+    inline Camera camera(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 45.0f);
+    inline Shader program;
+    
     inline glm::mat4 projection;
     inline glm::mat4 view;
 

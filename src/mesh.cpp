@@ -20,10 +20,15 @@ void Mesh::buildMesh() {
         glGenVertexArrays(1, m_Vao);
     }
 
-    float vertices[m_Verticies.size()];
-    for(int i = 0; i < m_Verticies.size(); i+=1)
-        vertices[i] = m_Verticies[i];
-
+    float vertices[m_Verticies.size() + m_Uvs.size()];
+    for(int i = 0; i < m_Verticies.size() / 3; i++)
+    {
+        vertices[i * 5 + 0] = m_Verticies[i * 3 + 0];
+        vertices[i * 5 + 1] = m_Verticies[i * 3 + 1];
+        vertices[i * 5 + 2] = m_Verticies[i * 3 + 2];
+        vertices[i * 5 + 3] = m_Uvs[i * 2 + 0];
+        vertices[i * 5 + 4] = m_Uvs[i * 2 + 1];
+    }
         
     glBindVertexArray(*m_Vao);
 

@@ -7,6 +7,7 @@
 #include <vector>
 
 enum BLOCK_TYPE {
+    GRASS,
     DIRT,
     AIR
 };

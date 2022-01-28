@@ -45,6 +45,10 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
     Application::camera.transform.setPitch(89.0f);
     if(Application::camera.transform.rotation.x < -89.0f)
     Application::camera.transform.setPitch(-89.0f);
+
+    /*std::cout << Application::camera.transform.rotation.x << " " <<
+                 Application::camera.transform.rotation.y << " " <<
+                 Application::camera.transform.rotation.z << std::endl;*/
 }
 
 void Application::ProcessInput(GLFWwindow *window)
