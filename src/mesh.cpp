@@ -37,10 +37,6 @@ void Mesh::buildMesh() {
         vertices[i * 5 + 3] = m_Uvs[i * 2 + 0];
         vertices[i * 5 + 4] = m_Uvs[i * 2 + 1];
     }
-
-    unsigned int indices[m_Triangles.size()];
-    for(i = 0; i < m_Triangles.size(); i+=1)
-        indices[i] = m_Triangles[i];
     
     glBindVertexArray(*m_Vao);
     
@@ -48,7 +44,7 @@ void Mesh::buildMesh() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *m_Ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(float) * m_Triangles.size(), m_Triangles.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
