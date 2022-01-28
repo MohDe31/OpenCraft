@@ -15,20 +15,20 @@ float voxelVerticies[] = {
     0.0f, 1.0f, 1.0f, // 7
 };
 
-unsigned int voxelIndices[6][6] = {
-    {0, 1, 2, 2, 3, 0},
-    {4, 5, 6, 6, 7, 4},
-    {7, 3, 0, 0, 4, 7},
-    {6, 2, 1, 1, 5, 6},
-    {0, 1, 5, 5, 4, 0},
-    {3, 2, 6, 6, 7, 3},
-};
-
 float voxelUvs[] = {
 	0.0f, 0.0f,
 	0.0f, 1.0f,
 	1.0f, 0.0f,
 	1.0f, 1.0f
+};
+
+unsigned int voxelIndices[6][6] = {
+    {0, 1, 2, 2, 3, 0}, // BACK FACE
+    {4, 5, 6, 6, 7, 4}, // FRONT FACE
+    {7, 3, 0, 0, 4, 7}, // LEFT FACE
+    {6, 2, 1, 1, 5, 6}, // RIGHT FACE
+    {0, 1, 5, 5, 4, 0}, // BOTTOM FACE
+    {3, 2, 6, 6, 7, 3}, // TOP FACE
 };
 
 
