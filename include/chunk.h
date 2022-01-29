@@ -31,6 +31,7 @@ typedef struct Chunk {
     
     Mesh m_Mesh;
 
+
     Chunk();
     Chunk(int x, int y);
     Chunk(int x, int y, std::vector<std::vector<int>> heightMap);

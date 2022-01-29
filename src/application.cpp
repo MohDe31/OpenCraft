@@ -132,18 +132,17 @@ void Application::Init(){
     Application::program.use();
     Application::program.setInt("uTexture", 0);
 
-    std::cout << "HELLO" << std::endl;
     Application::world = World();
 
-    Application::world.chunks[0][0].generateMesh();
-    Application::world.chunks[0][1].generateMesh();
-    Application::world.chunks[0][2].generateMesh();
-    Application::world.chunks[1][0].generateMesh();
-    Application::world.chunks[1][1].generateMesh();
-    Application::world.chunks[1][2].generateMesh();
-    Application::world.chunks[2][0].generateMesh();
-    Application::world.chunks[2][1].generateMesh();
-    Application::world.chunks[2][2].generateMesh();
+    // Application::world.chunks[0][0].generateMesh();
+    // Application::world.chunks[0][1].generateMesh();
+    // Application::world.chunks[0][2].generateMesh();
+    // Application::world.chunks[1][0].generateMesh();
+    // Application::world.chunks[1][1].generateMesh();
+    // Application::world.chunks[1][2].generateMesh();
+    // Application::world.chunks[2][0].generateMesh();
+    // Application::world.chunks[2][1].generateMesh();
+    // Application::world.chunks[2][2].generateMesh();
 }
 
 
@@ -173,16 +172,7 @@ void Application::Run(){
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, Application::texture);
         
-
-        chunk_renderer(Application::world.chunks[0][0], Application::program);
-        chunk_renderer(Application::world.chunks[0][1], Application::program);
-        chunk_renderer(Application::world.chunks[0][2], Application::program);
-        chunk_renderer(Application::world.chunks[1][0], Application::program);
-        chunk_renderer(Application::world.chunks[1][1], Application::program);
-        chunk_renderer(Application::world.chunks[1][2], Application::program);
-        chunk_renderer(Application::world.chunks[2][0], Application::program);
-        chunk_renderer(Application::world.chunks[2][1], Application::program);
-        chunk_renderer(Application::world.chunks[2][2], Application::program);
+        world.update();
 
         glfwPollEvents();
 

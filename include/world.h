@@ -2,9 +2,13 @@
 
 #include <chunk.h>
 
+#include <map>
+
 class World {
     public:
-        Chunk chunks[3][3];
-
+        std::map<std::pair<int, int>, Chunk> chunkStore;
         World();
+
+
+        void update();
 };
